@@ -7,7 +7,7 @@ Python's keyword arguments.
 Installation
 ------------
 
-Just copy the ``include/params14.h`` header somewhere and points to it using the ``-I`` flag.
+Just copy the ``include/params14.hpp`` header somewhere and points to it using the ``-I`` flag.
 
 Requirements
 ------------
@@ -24,7 +24,7 @@ Compiled with ``-std=c++14`` flag:
 
     #include <iostream>
 
-    #include <params14.h>
+    #include "params14.hpp"
 
     using namespace params14::literals;
 
