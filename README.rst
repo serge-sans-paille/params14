@@ -29,24 +29,37 @@ Compiled with ``-std=c++14`` flag:
     using namespace params14::literals;
 
     template<typename... KWArgs>
-    void dump_keywords(std::ostream& stream, KWArgs&&... kwargs) {
-        stream << params14::pick("greet"_kw, std::forward<KWArgs>(kwargs)...) << "\n"
-               << params14::pick_default("name"_kw, "folks", std::forward<KWArgs>(kwargs)...) << "\n";
+    void greet(std::ostream& stream, KWArgs&&... kwargs) {
+      // Initialize the keyword dict. static assert in case of double arguments
+      auto args = params14::parse(std::forward<KWArgs>(kwargs)...);
+
+      // some sanity checks
+      static_assert(args.keys.contains("greet"_kw), "ok");
+      static_assert(!args.keys.contains("gree"_kw), "ok");
+
+      // getter, with or without default
+      stream << args.get("greet"_kw) << "\n"
+             << args.get("name"_kw, "folks") << "\n";
+
+      // visitor
+      args.visit([&stream](char const kw[], auto const& value) {
+                   stream << kw << ": " << value << "\n";});
 
     }
 
     int main(int argc, char** argv) {
-        dump_keywords(std::cout, "greet"_kw="Demat",
-                                 "name"_kw="d'an holl");
+        greet(std::cout, "greet"_kw="Demat",
+                         "name"_kw="d'an holl");
         return 0;
     }
 
 
-Basically ``params14`` provides three entry points:
+Basically ``params14`` provides five entry point:
 
 - a string literal operator ``_kw`` that requires ``using namespace params14::literals;``. It's used to introduce keywords.
-- a way to extract mandatory keywords from a parameter pack: ``params14::pick("some"_kw, kwargs...)``.
-- a way to extract optional keywords with a default value from a parameter pack: ``params14::pick_default("some"_kw, default, kwargs...)``.
+- a way to parse arguments into a keyword-value dictionnary-like structure, ``KeywordArguments<...> params14::parse(...)``
+- a way to get value from that structure, with or without default value: ``KeywordArguments<...>::get(keyword [, default_value])``.
+- a generic way to visit keyword-value pairs: ``KeywordArguments<...>::visit(visitor)``.
 
 And that's it!
 
