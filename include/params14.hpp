@@ -110,12 +110,12 @@ class KeywordArguments {
 
 
   template<class C, C... cs>
-  auto get(Param<C, cs...> kw) {
+  auto& get(Param<C, cs...> kw) {
     return fwd_get_simple(kw, std::make_index_sequence<sizeof...(P)>());
   }
 
   template<class C, C... cs, class D>
-  auto get(Param<C, cs...> kw, D&& default_) {
+  decltype(auto) get(Param<C, cs...> kw, D&& default_) {
     return fwd_get_default(kw, std::forward<D>(default_), std::make_index_sequence<sizeof...(P)>());
   }
 
@@ -159,12 +159,12 @@ class KeywordArguments {
   }
 
   template<class C, C... cs, class D, class T, class Cp, C... csp, class... Args>
-  auto get_default(Param<C, cs...> kw, D&& default_, NamedParam<T, Cp, csp...> &p, Args&... args) {
+  decltype(auto) get_default(Param<C, cs...> kw, D&& default_, NamedParam<T, Cp, csp...> &p, Args&... args) {
     return get_default(kw, std::forward<D>(default_), args...);
   }
 
   template<class C, C... cs, class D, std::size_t... Is>
-  auto fwd_get_default(Param<C, cs...> kw, D&& default_, std::index_sequence<Is...>) {
+  decltype(auto) fwd_get_default(Param<C, cs...> kw, D&& default_, std::index_sequence<Is...>) {
     return get_default(kw, std::forward<D>(default_), std::get<Is>(kw_args)...);
   }
 
